@@ -177,9 +177,21 @@ func RefreshChildren(ih Ihandle) {
 func Execute(fileName, parameters string) int {
 	c_fileName := C.CString(fileName)
 	defer C.free(unsafe.Pointer(c_fileName))
+	c_parameters := C.CString(parameters)
+	defer C.free(unsafe.Pointer(c_parameters))
 
 	//int IupExecute(const char *filename, const char* parameters);
-	return int(C.IupExecute(c_fileName, C.CString(parameters)))
+	return int(C.IupExecute(c_fileName, c_parameters))
+}
+
+func ExecuteWait(fileName string, parameters string) int {
+	c_fileName := C.CString(fileName)
+	defer C.free(unsafe.Pointer(c_fileName))
+	c_parameters := C.CString(parameters)
+	defer C.free(unsafe.Pointer(c_parameters))
+
+	//int       IupExecuteWait(const char *filename, const char* parameters);
+	return int(C.IupExecuteWait(c_fileName, c_parameters))
 }
 
 //Help opens the given URL. In UNIX executes Netscape, Safari (MacOS) or Firefox (in Linux) passing the desired URL as a parameter.
@@ -979,6 +991,38 @@ func GetAttributeHandle(ih Ihandle, name string) Ihandle {
 	return mkih(C.IupGetAttributeHandle(ih.ptr(), c_name))
 }
 
+func IupSetAttributeHandleId(ih Ihandle, name string, id int, ihNamed Ihandle) {
+	c_name := C.CString(name)
+	defer C.free(unsafe.Pointer(c_name))
+
+	//void      IupSetAttributeHandleId(Ihandle* ih, const char* name, int id, Ihandle* ih_named);
+	C.IupSetAttributeHandleId(ih.ptr(), c_name, C.int(id), ihNamed.ptr())
+}
+
+func IupGetAttributeHandleId(ih Ihandle, name string, id int) Ihandle {
+	c_name := C.CString(name)
+	defer C.free(unsafe.Pointer(c_name))
+
+	//Ihandle*  IupGetAttributeHandleId(Ihandle* ih, const char* name, int id);
+	return mkih(C.IupGetAttributeHandleId(ih.ptr(), c_name, C.int(id)))
+}
+
+func IupSetAttributeHandleId2(ih Ihandle, name string, lin int, col int, ihNamed Ihandle) {
+	c_name := C.CString(name)
+	defer C.free(unsafe.Pointer(c_name))
+
+	//void      IupSetAttributeHandleId2(Ihandle* ih, const char* name, int lin, int col, Ihandle* ih_named);
+	C.IupSetAttributeHandleId2(ih.ptr(), c_name, C.int(lin), C.int(col), ihNamed.ptr())
+}
+
+func IupGetAttributeHandleId2(ih Ihandle, name string, lin int, col int) Ihandle {
+	c_name := C.CString(name)
+	defer C.free(unsafe.Pointer(c_name))
+
+	//Ihandle*  IupGetAttributeHandleId2(Ihandle* ih, const char* name, int lin, int col);
+	return mkih(C.IupGetAttributeHandleId2(ih.ptr(), c_name, C.int(lin), C.int(col)))
+}
+
 //GetClassName returns the name of the class of an interface element.
 func GetClassName(ih Ihandle) string {
 	//char* IupGetClassName(Ihandle* ih);
@@ -1207,6 +1251,11 @@ func ScrollBox(child Ihandle) Ihandle {
 	return mkih(C.IupScrollBox(child.ptr()))
 }
 
+// func FlatScrollBox(child Ihandle) Ihandle {
+// 	//Ihandle*  IupFlatScrollBox(Ihandle* child);
+// 	return mkih(C.IupFlatScrollBox(child.ptr()))
+// }
+
 //GridBox creates a void container for composing elements in a regular grid.
 //It is a box that arranges the elements it contains from top to bottom and from left to right,
 //but can distribute the elements in lines or in columns.
@@ -1270,6 +1319,11 @@ func BackgroundBox(child Ihandle) Ihandle {
 func Frame(child Ihandle) Ihandle {
 	//Ihandle* IupFrame (Ihandle* child);
 	return mkih(C.IupFrame(child.ptr()))
+}
+
+func FlatFrame(child Ihandle) Ihandle {
+	//Ihandle*  IupFlatFrame  (Ihandle* child);
+	return mkih(C.IupFlatFrame(child.ptr()))
 }
 
 //Image creates an image to be shown on a label, button, toggle, or as a cursor.
@@ -1460,6 +1514,14 @@ func Tabs(children ...Ihandle) Ihandle {
 	//Ihandle* IupTabs (Ihandle* child, ...);
 	//Ihandle* IupTabsv (Ihandle* *children);
 	return mkih(C.IupTabsv((**C.Ihandle)(unsafe.Pointer(&(children[0])))))
+}
+
+func FlatTabs(children ...Ihandle) Ihandle {
+	children = append(children, Ihandle(0))
+
+	//Ihandle*  IupFlatTabs   (Ihandle* first, ...);
+	//Ihandle*  IupFlatTabsv  (Ihandle* *children);
+	return mkih(C.IupFlatTabsv((**C.Ihandle)(unsafe.Pointer(&(children[0])))))
 }
 
 //Tree creates a tree containing nodes of branches or leaves. Both branches and leaves can have an associated text and image.
@@ -1880,7 +1942,7 @@ func GetParam(title string, action Iparamcb, userData uintptr, format string, ar
 		}
 	}
 
-	dlg := ParamBox(0, handles)
+	dlg := ParamBox(handles...)
 	defer Destroy(dlg)
 
 	dlg.SetAttribute("PARENTDIALOG", GetGlobalIh("PARENTDIALOG"))
@@ -1934,14 +1996,19 @@ func Param(format string) Ihandle {
 	c_format := C.CString(format)
 	defer C.free(unsafe.Pointer(c_format))
 
-	//Ihandle* IupParamf(const char* format);
-	return mkih(C.IupParamf(c_format))
+	//Ihandle* IupParam(const char* format);
+	return mkih(C.IupParam(c_format))
 }
 
 //ParamBox creates the IupGetParam dialog contents with the array of parameters. This includes the button box at the bottom.
-func ParamBox(parent Ihandle, params []Ihandle) Ihandle {
-	//Ihandle* IupParamBox(Ihandle* parent, Ihandle** params, int count);
-	return mkih(C.IupParamBox(parent.ptr(), (**C.struct_Ihandle_)(unsafe.Pointer(&params[0])), C.int(len(params))))
+// func ParamBox(parent Ihandle, params []Ihandle) Ihandle {
+// 	//Ihandle* IupParamBox(Ihandle* parent, Ihandle** params, int count);
+// 	return mkih(C.IupParamBox(parent.ptr(), (**C.struct_Ihandle_)(unsafe.Pointer(&params[0])), C.int(len(params))))
+// }
+func ParamBox(children ...Ihandle) Ihandle {
+	//Ihandle*  IupParamBox(Ihandle* child, ...);
+	//Ihandle*  IupParamBoxv(Ihandle* *children);
+	return mkih(C.IupParamBoxv((**C.Ihandle)(unsafe.Pointer(&children[0]))))
 }
 
 //LayoutDialog creates a Layout Dialog. It is a predefined dialog to visually edit the layout of another dialog in run time.
@@ -2129,11 +2196,12 @@ const (
 /* ------------------------------- */
 
 const (
-	GETPARAM_BUTTON1 = -1               // iup.GetParam callback situation
-	GETPARAM_INIT    = -2               // iup.GetParam callback situation
-	GETPARAM_BUTTON2 = -3               // iup.GetParam callback situation
-	GETPARAM_BUTTON3 = -4               // iup.GetParam callback situation
-	GETPARAM_CLOSE   = -5               // iup.GetParam callback situation
+	GETPARAM_BUTTON1 = -1 // iup.GetParam callback situation
+	GETPARAM_INIT    = -2 // iup.GetParam callback situation
+	GETPARAM_BUTTON2 = -3 // iup.GetParam callback situation
+	GETPARAM_BUTTON3 = -4 // iup.GetParam callback situation
+	GETPARAM_CLOSE   = -5 // iup.GetParam callback situation
+	IUP_GETPARAM_MAP = -6
 	GETPARAM_OK      = GETPARAM_BUTTON1 // iup.GetParam callback situation
 	GETPARAM_CANCEL  = GETPARAM_BUTTON2 // iup.GetParam callback situation
 	GETPARAM_HELP    = GETPARAM_BUTTON3 // iup.GetParam callback situation
