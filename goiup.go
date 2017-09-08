@@ -44,6 +44,11 @@ func (ih Ihandle) SetHandle(name string) Ihandle {
 	return ih
 }
 
+func (ih Ihandle) AssignTo(ihPtr **Ihandle) Ihandle {
+	*ihPtr = &ih
+	return ih
+}
+
 func (ih Ihandle) Destroy() {
 	Destroy(ih)
 }
