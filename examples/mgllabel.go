@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/matwachich/iup"
-	"github.com/matwachich/iup/iupmglplot"
+	"github.com/alanyuen/iup"
+	"github.com/alanyuen/iup/iupmglplot"
 )
 
 func main() {

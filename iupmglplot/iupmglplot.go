@@ -3,7 +3,7 @@ package iupmglplot
 import (
 	"unsafe"
 
-	"github.com/matwachich/iup"
+	"github.com/alanyuen/iup"
 )
 
 /*

@@ -3,7 +3,7 @@ package iupweb
 import (
 	"unsafe"
 
-	"github.com/matwachich/iup"
+	"github.com/alanyuen/iup"
 )
 
 //broken! cannot use with GCC (visual C only)

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"unsafe"
 
-	"github.com/matwachich/iup"
+	"github.com/alanyuen/iup"
 )
 
 /*

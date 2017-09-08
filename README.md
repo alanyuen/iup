@@ -1,3 +1,9 @@
+# Note
+#************************************************************
+This is original fort from "github.com/matwachich/iup".
+It is renamed to "github.com/alanyuen/iup" for easier use.
+#************************************************************
+
 # IUP
 GoLang wrapper for IUP GUI library (3.18)
 
@@ -9,7 +15,7 @@ It is only tested and developped for windows (actually on a 64bits Windows 7) si
 To install and use this wrapper, you first need to download it
 
 ```
-go get github.com/matwachich/iup
+go get github.com/alanyuen/iup
 ```
 
 Then, you must create a directory inside the iup folder called "lib" and put in it the static IUP libraries. You also can if you want/need to use IM or CD create the folders "im" and "cd" inside the "lib" folder and put in it the IM and CD static libraries.
@@ -26,7 +32,7 @@ Then you can test this hello world example:
 ```go
 package main
 
-import "github.com/matwachich/iup"
+import "github.com/alanyuen/iup"
 
 func main() {
     iup.Open()

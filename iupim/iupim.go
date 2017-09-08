@@ -3,7 +3,7 @@ package iupim
 import (
 	"unsafe"
 
-	"github.com/matwachich/iup"
+	"github.com/alanyuen/iup"
 )
 
 /*

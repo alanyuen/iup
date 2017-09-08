@@ -14,7 +14,7 @@ package iupmatrixex
 import (
 	"unsafe"
 
-	"github.com/matwachich/iup"
+	"github.com/alanyuen/iup"
 )
 
 /*
