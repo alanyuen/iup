@@ -1,8 +1,8 @@
 # Note
-#************************************************************
+************************************************************
 This is original fort from "github.com/matwachich/iup".
 It is renamed to "github.com/alanyuen/iup" for easier use.
-#************************************************************
+************************************************************
 
 # IUP
 GoLang wrapper for IUP GUI library (3.18)
