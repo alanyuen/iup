@@ -10,6 +10,7 @@ import (
 func main() {
 	iup.Open()
 	defer iup.Close()
+	iup.SetGlobal("UTF8MODE", "YES")
 
 	canvas := iup.Canvas("ACTION")
 	iup.SetCallback(canvas, "ACTION", redraw)
@@ -40,7 +41,7 @@ func redraw(self iup.Ihandle, x float32, y float32) int {
 	//	iupdraw.Arc(self, 0, 0, 100, 100, 0, 0)
 
 	iup.SetAttribute(self, "DRAWCOLOR", "0 0 255")
-	text := "01234567890"
+	text := "01234567890中文"
 	iupdraw.Text(self, text, len(text), 0, 110)
 
 	//	iup.SetAttribute(self, "DRAWCOLOR", "255 0 0")

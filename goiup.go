@@ -2,6 +2,7 @@ package iup
 
 import (
 	"fmt"
+	"reflect"
 	"unsafe"
 )
 
@@ -231,6 +232,12 @@ func GetPtrId2(ih Ihandle, name string, lin, col int) uintptr {
 
 func (ih Ihandle) SetCallback(name string, fn interface{}) Ihandle {
 	SetCallback(ih, name, fn)
+	return ih
+}
+
+func (ih Ihandle) SetCallbackPtr(name string, fnPtr interface{}) Ihandle {
+	p := reflect.ValueOf(fnPtr).Pointer()
+	SetCallbackPtr(ih, name, p)
 	return ih
 }
 

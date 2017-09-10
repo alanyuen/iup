@@ -876,6 +876,16 @@ func SetCallback(ih Ihandle, name string, fn interface{}) uintptr {
 	}
 }
 
+func SetCallbackPtr(ih Ihandle, name string, fn interface{}) uintptr {
+	c_name := C.CString(name)
+	defer C.free(unsafe.Pointer(c_name))
+
+	//Icallback IupSetCallback (Ihandle* ih, const char *name, Icallback func);
+	//Ihandle* IupSetCallbacks(Ihandle* ih, const char *name, Icallback func, ...);
+
+	return uintptr(unsafe.Pointer(C.__IupSetCallback(ih.ptr(), c_name, unsafe.Pointer(fn.(uintptr)))))
+}
+
 //GetFunction returns the function associated to an action only when they were set by IupSetFunction.
 //It will not work if IupSetCallback were used.
 //
