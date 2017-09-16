@@ -1952,16 +1952,22 @@ func GetParam(title string, action Iparamcb, userData uintptr, format string, ar
 		}
 	}
 
-	dlg := ParamBox(handles...)
-	defer Destroy(dlg)
+	box := ParamBox(handles...)
 
-	dlg.SetAttribute("PARENTDIALOG", GetGlobalIh("PARENTDIALOG"))
-	dlg.SetAttribute("ICON", GetGlobalIh("ICON"))
-	dlg.SetAttribute("TITLE", title)
-	dlg.SetAttribute("USERDATA", userData)
-	dlg.SetCallback("PARAM_CB", action)
-	dlg.SetCallback("CLOSE_CB", func(ih Ihandle) int {
-		if action != nil && action(dlg, GETPARAM_CLOSE, userData) == 0 {
+	dlg := Dialog(box).SetAttributes(map[string]interface{}{
+		"MINBOX":       "NO",
+		"MAXBOX":       "NO",
+		"PARENTDIALOG": GetGlobal("PARENTDIALOG"),
+		"ICON":         GetGlobal("ICON"),
+		"TITLE":        title,
+	})
+	defer dlg.Destroy()
+	SetAttributeHandle(dlg, "PARAMBOX", box)
+
+	box.SetAttribute("USERDATA", userData)
+	box.SetCallback("PARAM_CB", action)
+	box.SetCallback("CLOSE_CB", func(ih Ihandle) int {
+		if action != nil && action(box, GETPARAM_CLOSE, userData) == 0 {
 			return IGNORE
 		} else {
 			return CLOSE
@@ -1969,13 +1975,13 @@ func GetParam(title string, action Iparamcb, userData uintptr, format string, ar
 	})
 
 	if action != nil {
+		action(box, GETPARAM_MAP, userData)
 		Map(dlg)
-		action(dlg, GETPARAM_INIT, userData)
+		action(box, GETPARAM_INIT, userData)
 	}
 
 	Popup(dlg, CENTERPARENT, CENTERPARENT)
-
-	if dlg.GetInt("STATUS") == 0 {
+	if box.GetInt("STATUS") == 0 {
 		return false
 	}
 
@@ -2016,6 +2022,8 @@ func Param(format string) Ihandle {
 // 	return mkih(C.IupParamBox(parent.ptr(), (**C.struct_Ihandle_)(unsafe.Pointer(&params[0])), C.int(len(params))))
 // }
 func ParamBox(children ...Ihandle) Ihandle {
+	children = append(children, Ihandle(0))
+
 	//Ihandle*  IupParamBox(Ihandle* child, ...);
 	//Ihandle*  IupParamBoxv(Ihandle* *children);
 	return mkih(C.IupParamBoxv((**C.Ihandle)(unsafe.Pointer(&children[0]))))
@@ -2211,7 +2219,7 @@ const (
 	GETPARAM_BUTTON2 = -3 // iup.GetParam callback situation
 	GETPARAM_BUTTON3 = -4 // iup.GetParam callback situation
 	GETPARAM_CLOSE   = -5 // iup.GetParam callback situation
-	IUP_GETPARAM_MAP = -6
+	GETPARAM_MAP     = -6
 	GETPARAM_OK      = GETPARAM_BUTTON1 // iup.GetParam callback situation
 	GETPARAM_CANCEL  = GETPARAM_BUTTON2 // iup.GetParam callback situation
 	GETPARAM_HELP    = GETPARAM_BUTTON3 // iup.GetParam callback situation
